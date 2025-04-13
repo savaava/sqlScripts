@@ -30,6 +30,7 @@ INSERT INTO impiegato VALUES('Carlo','Bianchi','Produzione',20,3600,'Torino');
 INSERT INTO impiegato VALUES('Giovanni','Verdi','Amministrazione',20,4000,'Roma');
 INSERT INTO impiegato VALUES('Franco','Neri','Distribuzione',16,4500,'Napoli');
 INSERT INTO impiegato VALUES('Carlo','Rossi','Direzione',14,8000,'Milano');
+INSERT INTO impiegato VALUES('Gino','Rossi','Direzione',5,8000,'Genova');
 INSERT INTO impiegato VALUES('Lorenzo','Gialli','Direzione',7,7300,'Genova');
 INSERT INTO impiegato VALUES('Paola','Rosati','Amministrazione',75,4000,'Venezia');
 INSERT INTO impiegato VALUES('Marco','Franco','Produzione',20,4600,'Roma');
@@ -103,12 +104,23 @@ INSERT INTO automobile VALUES ('ZB421JJ','Fiat','Uno',null);
 	WHERE d.nome IN ('Ricerca', 'Amministrazione', 'Direzione');*/
 
 -- 17 Estrarre tutti gli impiegati che hanno lo stesso cognome e nome diverso del dipartimento Produzione
-SELECT i1.nome,i1.cognome FROM impiegato i1, impiegato i2
+/*SELECT i1.nome,i1.cognome FROM impiegato i1, impiegato i2
 	WHERE i1.dipart = 'Produzione' 
 		AND i1.nome <> i2.nome
-		AND i1.cognome = i2.cognome;
+		AND i1.cognome = i2.cognome;*/
 
 -- 18 Estrarre il nome e lo stipendio dei capi degli impiegati che guadagnano più di 40k
+
+
+-- Prove mie
+/*SELECT nome,stipendio FROM impiegato
+	WHERE stipendio=(SELECT MAX(stipendio) FROM impiegato)
+	ORDER BY nome DESC;*/
+
+/*SELECT MAX(stipendio), AVG(stipendio) FROM impiegato;*/
+
+/*SELECT dipart,AVG(stipendio) FROM impiegato
+	GROUP BY dipart;*/
 
 
 /* *************************** guidatore - automobile *************************** */
