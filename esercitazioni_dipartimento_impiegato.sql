@@ -134,8 +134,8 @@ INSERT INTO automobile VALUES ('ZB421JJ','Fiat','Uno',null);
 	WHERE g.nro_patente=a.guidatore; --(è una INNER JOIN)*/
 
 -- Estrarre tutti i guidatori e tutte le auto, mostrando tutte le relazioni esistenti tra essi
-/*SELECT g.*,targa,marca,modello FROM guidatore g
-	FULL JOIN automobile a ON g.nro_patente=a.guidatore;*/
+SELECT g.*,targa,marca,modello FROM guidatore g
+	FULL JOIN automobile a ON g.nro_patente=a.guidatore;
 
 
 
