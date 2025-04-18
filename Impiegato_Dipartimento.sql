@@ -289,13 +289,6 @@ SELECT DISTINCT dipart
 			FROM impiegato
 	);
 
-SELECT DISTINCT i1.dipart
-	FROM impiegato i1
-	WHERE i1.stipendio > ALL (
-		SELECT i2.stipendio FROM impiegato i2 
-			WHERE i2.dipart<>i1.dipart 
-	);
-
 SELECT DISTINCT dipart
 	FROM impiegato
 	WHERE stipendio >= ALL (
@@ -314,13 +307,6 @@ SELECT
 		SELECT nome FROM dipartimento 
 			WHERE citta=(SELECT citta FROM dipartimento WHERE nome='Amministrazione')
 	);
-
-
-
-
-
-
-
 
 
 
