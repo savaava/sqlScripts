@@ -282,7 +282,7 @@ SELECT
 	CASE 
 		WHEN gender='M' THEN 'MALE'
 		WHEN gender='F' THEN 'FEMALE' 
-		END gender
+	END gender
 	
     FROM patients
 
