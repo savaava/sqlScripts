@@ -304,13 +304,10 @@ SELECT
 	dipart
 	FROM impiegato
 	WHERE dipart='Amministrazione' OR dipart = ANY (
-		SELECT nome FROM dipartimento 
-			WHERE citta=(SELECT citta FROM dipartimento WHERE nome='Amministrazione')
+		SELECT nome FROM dipartimento WHERE citta=(
+			SELECT citta FROM dipartimento WHERE nome='Amministrazione'
+		)
 	);
-
-
-
-
 
 
 

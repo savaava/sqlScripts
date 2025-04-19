@@ -88,3 +88,115 @@ INSERT INTO Catalogo (fid,pid,costo) VALUES ('F3','P4',450);
 INSERT INTO Catalogo (fid,pid,costo) VALUES ('F3','P8',60); 
 INSERT INTO Catalogo (fid,pid,costo) VALUES ('F4','P2',60); 
 INSERT INTO Catalogo (fid,pid,costo) VALUES ('F4','P15',80);
+
+-- ==================================================================== 
+-- ESERCITAZIONI
+-- ==================================================================== 
+
+/*Contare il numero di tipologie di prodotti diversi (e.g., volante, sedile, etc.)
+presenti nel database, senza considerare il colore*/
+SELECT 
+	nome AS tipologia_prodotto, 
+	COUNT(*) AS "quantità"
+	FROM prodotti
+	GROUP BY nome;
+
+
+
+/* Prezzo più basso per il sedile rosso */
+SELECT MIN(costo)
+	FROM catalogo c JOIN prodotti p USING(pid)
+	WHERE nome='Sedile' AND colore='Rosso';
+
+
+
+/* Costo medio dei Volanti per colore */
+SELECT 
+	colore AS colore_volante,
+	CAST(AVG(costo) AS NUMERIC(10,2)) AS costo_medio
+	FROM catalogo c JOIN prodotti USING(pid)
+	WHERE nome='Volante' 
+	GROUP BY colore;
+
+
+
+/* Numero di prodotti di ogni fornitore, in ordine decrescente */
+SELECT 
+	nome AS fornitore,
+	COUNT(pid) AS num_prodotti --COUNT(pid) -> per non contare i valori nulli (se un F non ha prodotti vengono contate comunque le righe con i null per il LEFT JOIN)
+	FROM fornitori LEFT JOIN catalogo USING(fid)
+	GROUP BY fid,nome
+	ORDER BY num_prodotti DESC;
+
+
+
+/* Nome del fornitore e numero di prodotti, solo dei fornitori che vendono più di 9 pezzi */
+SELECT 
+	nome AS fornitore
+	FROM fornitori
+	WHERE fid = ANY (
+		SELECT fid
+			FROM catalogo 
+			GROUP BY fid
+			HAVING(COUNT(*)>9)	
+	);
+
+SELECT 
+	nome AS fornitore,
+	COUNT(*) AS num_prodotti
+	FROM fornitori JOIN catalogo USING(fid)
+	GROUP BY nome
+	HAVING(COUNT(*)>9);
+
+
+
+/* Nome prodotto e costo medio di tutti i prodotti di colore Nero */
+SELECT 
+	nome AS nome_prodotto,
+	CAST(AVG(costo) AS NUMERIC(10,2)) AS costo_medio
+	FROM prodotti JOIN catalogo USING(pid)
+	WHERE colore='Nero'
+	GROUP BY nome;
+
+
+
+/* Prezzo medio dei sedili (Indipendentemente dal colore) di ogni fornitore */
+SELECT 
+	f.nome AS nome_fornitore,
+	p.nome AS prodotto,
+	CAST(AVG(costo) AS NUMERIC(10,2)) AS costo_medio
+	FROM catalogo c
+		JOIN prodotti p USING(pid)
+		JOIN fornitori f USING(fid)
+	WHERE p.nome='Sedile'
+	GROUP BY f.nome,p.nome;
+	
+
+
+/* Contare il numero di prodotti per colore */
+SELECT 
+	colore AS colore_prodotti,
+	COUNT(*) AS num_prodotti
+	FROM prodotti
+	GROUP BY colore;
+
+
+
+/* Eliminare il colore per il Volante Rosso; */
+UPDATE prodotti
+	SET colore = NULL -- oppure DEFAULT perchè in questo caso NULL è il valore di default per colore 
+	WHERE nome='Volante' AND colore='Rosso';
+SELECT * FROM prodotti;
+
+
+
+
+
+
+
+
+
+
+
+
+	
