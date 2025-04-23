@@ -188,6 +188,164 @@ UPDATE prodotti
 	WHERE nome='Volante' AND colore='Rosso';
 SELECT * FROM prodotti;
 
+UPDATE prodotti
+	SET colore='Rosso'
+	WHERE pid='P2';
+
+
+
+/*
+Trovare i prodotti forniti dalla ACME e da nessun altro, senza fare uso di Differenza
+insiemistica: utilizzare un approccio con uso di Exists o Not Exsists
+*/
+SELECT p.pid, p.nome, p.colore
+	FROM catalogo 
+		JOIN fornitori f USING(fid)
+		JOIN prodotti p USING(pid)
+	WHERE f.nome='ACME'
+		AND NOT EXISTS (
+			SELECT * 
+				FROM catalogo c JOIN fornitori f2 USING(fid)
+				WHERE c.pid=p.pid AND f2.nome<>'ACME'
+		);
+
+SELECT p.pid, p.nome, p.colore
+	FROM catalogo 
+		JOIN fornitori f USING(fid)
+		JOIN prodotti p USING(pid)
+	WHERE f.nome='ACME'
+EXCEPT
+SELECT p.pid, p.nome, p.colore
+	FROM catalogo 
+		JOIN fornitori f USING(fid)
+		JOIN prodotti p USING(pid)
+	WHERE f.nome<>'ACME';
+
+
+
+/* Trovare i nomi dei fornitori che forniscono ogni prodotto */
+SELECT DISTINCT F.nome
+	FROM Fornitori F
+	WHERE NOT EXISTS (
+		SELECT P.pid FROM Prodotti P
+			WHERE P.pid NOT IN(
+				SELECT C.pid FROM Catalogo C
+					WHERE C.fid=F.fid
+			)
+	);
+
+SELECT DISTINCT F.nome
+	FROM Fornitori F
+	WHERE NOT EXISTS (
+		SELECT P.pid FROM Prodotti P
+			EXCEPT
+		SELECT C.pid
+			FROM Catalogo C
+			WHERE C.fid = F.fid
+	);
+
+
+
+/* Trovare i nomi dei fornitori che forniscono tutti i prodotti rossi */
+SELECT DISTINCT f.nome
+	FROM Fornitori f
+	WHERE NOT EXISTS( --se non esistono prodotti rossi non venduti dal fornitore corrente
+		SELECT p.pid
+			FROM prodotti p
+			WHERE colore='Rosso'
+		EXCEPT
+		SELECT c.pid
+			FROM catalogo c JOIN prodotti p2 USING(pid)
+			WHERE p2.colore='Rosso' AND f.fid=c.fid
+	);
+	
+SELECT DISTINCT f.nome
+	FROM Fornitori f
+	WHERE NOT EXISTS (
+    	SELECT *
+    		FROM Prodotti p
+    		WHERE p.colore = 'Rosso'
+    			AND p.pid NOT IN (
+        			SELECT c.pid
+        				FROM Catalogo c
+        					WHERE c.fid = f.fid
+    			)
+	);
+
+
+
+
+/* Trovare gli id dei fornitori che ricaricano su alcuni prodotti più del costo medio di quel prodotto */
+SELECT DISTINCT fid
+	FROM fornitori f JOIN catalogo c USING(fid)
+	WHERE c.costo > (
+		SELECT AVG(costo)
+			FROM catalogo c1
+			WHERE c1.pid=c.pid AND c1.fid<>c.fid
+	);
+
+
+
+/* Trovare gli id e i nomi dei fornitori che forniscono solo prodoE rossi */
+SELECT DISTINCT f.fid, f.nome
+	FROM fornitori f JOIN catalogo USING(fid) -- JOIN per evitare fornitori che non vendono prodotti
+	WHERE 'Rosso' = ALL ( -- se tutti i prodotti venduti dal fornitore corrente sono rossi
+		SELECT colore
+			FROM catalogo c1 JOIN prodotti USING(pid)
+			WHERE f.fid = c1.fid
+	);
+
+SELECT f.fid, f.nome
+	FROM fornitori f
+	WHERE NOT EXISTS ( -- se non esistono prodotti di colore != Rosso venduti dal fornitore corrente
+		SELECT *
+			FROM catalogo c JOIN prodotti p USING(pid)
+			WHERE f.fid = c.fid AND p.colore <> 'Rosso'
+	) AND EXISTS ( -- devo controllare che il fornitore corrente vende almeno un prodotto
+		SELECT *
+			FROM catalogo c1
+			WHERE c1.fid=f.fid
+	);
+
+
+
+/* Trovare i fid dei fornitori che forniscono un prodotto rosso e un prodotto verde */
+SELECT DISTINCT c1.fid
+	FROM catalogo c1
+		JOIN prodotti p1 ON c1.pid=p1.pid
+		JOIN catalogo c2 ON c1.fid=c2.fid
+		JOIN prodotti p2 ON c2.pid=p2.pid
+	WHERE p1.colore='Rosso' AND p2.colore='Verde';
+
+SELECT fid
+	FROM fornitori f
+	WHERE EXISTS (
+		SELECT *
+			FROM catalogo c JOIN prodotti p USING(pid)
+			WHERE c.fid = f.fid AND p.colore = 'Rosso'
+	) AND EXISTS (
+		SELECT *
+			FROM catalogo c JOIN prodotti p USING(pid)
+			WHERE c.fid = f.fid AND p.colore = 'Verde'
+	);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
