@@ -234,13 +234,12 @@ SELECT DISTINCT F.nome
 			)
 	);
 
-SELECT DISTINCT F.nome
+SELECT DISTINCT nome
 	FROM Fornitori F
 	WHERE NOT EXISTS (
-		SELECT P.pid FROM Prodotti P
+		SELECT pid FROM Prodotti
 			EXCEPT
-		SELECT C.pid
-			FROM Catalogo C
+		SELECT pid FROM Catalogo C
 			WHERE C.fid = F.fid
 	);
 
@@ -328,7 +327,6 @@ SELECT fid
 			FROM catalogo c JOIN prodotti p USING(pid)
 			WHERE c.fid = f.fid AND p.colore = 'Verde'
 	);
-
 
 
 
