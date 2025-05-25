@@ -163,13 +163,13 @@ SELECT
 /* Prezzo medio dei sedili (Indipendentemente dal colore) di ogni fornitore */
 SELECT 
 	f.nome AS nome_fornitore,
-	p.nome AS prodotto,
+	f.fid,
 	CAST(AVG(costo) AS NUMERIC(10,2)) AS costo_medio
 	FROM catalogo c
 		JOIN prodotti p USING(pid)
 		JOIN fornitori f USING(fid)
 	WHERE p.nome='Sedile'
-	GROUP BY f.nome,p.nome;
+	GROUP BY f.nome,f.fid;
 	
 
 
@@ -306,9 +306,21 @@ SELECT f.fid, f.nome
 			WHERE c1.fid=f.fid
 	);
 
+SELECT fid, nome
+	FROM fornitori f
+	WHERE NOT EXISTS ( -- se non esistono prodotti di colore != Rosso venduti dal fornitore corrente
+		SELECT pid FROM catalogo c WHERE c.fid=f.fid
+		EXCEPT
+		SELECT pid FROM catalogo c JOIN prodotti USING(pid)
+			WHERE c.fid=f.fid AND colore='Rosso'
+	) AND EXISTS ( -- devo controllare che il fornitore corrente vende almeno un prodotto
+		SELECT *
+			FROM catalogo c1
+			WHERE c1.fid=f.fid
+	);
 
 
-/* Trovare i fid dei fornitori che forniscono un prodotto rosso e un prodotto verde */
+/* Trovare i fid dei fornitori che forniscono almeno un prodotto rosso e un prodotto verde */
 SELECT DISTINCT c1.fid
 	FROM catalogo c1
 		JOIN prodotti p1 ON c1.pid=p1.pid
@@ -328,16 +340,23 @@ SELECT fid
 			WHERE c.fid = f.fid AND p.colore = 'Verde'
 	);
 
+/* Trovare i fid dei fornitori che forniscono esattamente un prodotto rosso e un prodotto verde */
+SELECT fid 
+	FROM fornitori F
+	WHERE 
+		2 = ( SELECT COUNT(*) FROM catalogo c WHERE c.fid=f.fid ) AND
+		1 = ( SELECT COUNT(*) FROM catalogo c JOIN Prodotti USING(pid)
+				WHERE c.fid=f.fid AND colore='Rosso' ) AND
+		1 = ( SELECT COUNT(*) FROM catalogo c JOIN Prodotti USING(pid)
+				WHERE c.fid=f.fid AND colore='Verde' );
 
-
-
-
-
-
-
-
-
-
+SELECT c.fid
+FROM catalogo c
+JOIN prodotti p ON c.pid = p.pid
+GROUP BY c.fid
+HAVING COUNT(*) = 2
+   AND SUM(CASE WHEN p.colore = 'Rosso' THEN 1 ELSE 0 END) = 1
+   AND SUM(CASE WHEN p.colore = 'Verde' THEN 1 ELSE 0 END) = 1;
 
 
 
